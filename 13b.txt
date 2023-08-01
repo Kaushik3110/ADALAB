@@ -1,0 +1,71 @@
+#include <stdio.h>
+
+int table[100][100];
+int val[100], wt[100];
+
+int max(int a, int b)
+{
+    return (a > b) ? a : b;
+}
+
+int knapsack(int i, int j)
+{
+    if (i < 0 || j <= 0)
+        return 0;
+    if (table[i][j] != -1)
+        return table[i][j];
+    if (wt[i - 1] > j)
+        table[i][j] = knapsack(i - 1, j);
+    else
+        table[i][j] = max(val[i - 1] + knapsack(i - 1, j - wt[i - 1]), knapsack(i - 1, j));
+    return table[i][j];
+}
+
+void printSelectedItems(int n, int capacity)
+{
+    printf("Composition of items chosen:\n");
+    int i = n;
+    int j = capacity;
+    while (i > 0 && j > 0)
+    {
+        if (table[i][j] != table[i - 1][j])
+        {
+            printf("Item %d\n", i);
+            j = j - wt[i - 1];
+        }
+        i--;
+    }
+}
+
+int main()
+{
+    int n, capacity;
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
+    printf("Enter the capacity: ");
+    scanf("%d", &capacity);
+    for (int i = 0; i < n; i++)
+    {
+        printf("\nEnter value and weight for item %d: ", i + 1);
+        scanf("%d %d", &val[i], &wt[i]);
+    }
+
+    for (int i = 0; i <= n; i++)
+    {
+        for (int j = 0; j <= capacity; j++)
+        {
+            if (i == 0 || j == 0)
+                table[i][j] = 0;
+            else
+                table[i][j] = -1;
+        }
+    }
+
+    int maxValue = knapsack(n, capacity);
+
+    printf("\nMax value: %d\n", maxValue);
+
+    printSelectedItems(n, capacity);
+
+    return 0;
+}
